@@ -25,14 +25,10 @@ Upload45: music-45.45.hex
 	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U flash:w:$<:i
 
 ReadFuses328:
-	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU328) -c $(PROG328) -P $(PORT) -b $(BAUD328) -U lfuse:r:lfuse328.hex:i
-	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU328) -c $(PROG328) -P $(PORT) -b $(BAUD328) -U hfuse:r:hfuse328.hex:i
-	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU328) -c $(PROG328) -P $(PORT) -b $(BAUD328) -U efuse:r:efuse328.hex:i
+	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU328) -c $(PROG328) -P $(PORT) -b $(BAUD328) -U lfuse:r:lfuse328.hex:i -U hfuse:r:hfuse328.hex:i -U efuse:r:efuse328.hex:i
 
 ReadFuses45:
-	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U lfuse:r:lfuse45.hex:i
-	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U hfuse:r:hfuse45.hex:i
-	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U efuse:r:efuse45.hex:i
+	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U lfuse:r:lfuse45.hex:i -U hfuse:r:hfuse45.hex:i -U efuse:r:efuse45.hex:i
 
 notes-328.asm: Notes.rb
 	ruby Notes.rb 16000000 8000 > $@

@@ -11,6 +11,17 @@
 	.equ PIN_SPK, 6		; OC0A / Port D #6 / ARDUINO 6
 	.equ PIN_BTN, 2		; Int0 / Port D #2 / ARDUINO 2
 	.equ PIN_LED, 4		; Port B #4 / ARDUINO 12
+
+	;; Register statics, aliases
+	.equ Val00, 0
+	.equ Val01, 1
+	.equ ValFF, 2
+	.equ MemBase, 4
+	.equ MemPitch, 6
+	.equ MemDuration, 8
+	.equ MemTOC, 10
+	.equ MemTOCLo, 10
+	.equ MemTOCHi, 11
 	
 ;;; ========================================================================
 ;;; interrupt table
@@ -160,29 +171,27 @@ RESET:
 	ldi r16, 0x01
 	out SMCR, r16		; sleep mode: idle
 
-	;; statics, aliases
-	eor r0, r0		; r0 == 0
-	mov r1, r0
-	inc r1			; r1 == 1
-	mov r2, r0
-	dec r2                  ; r2 == ff
+	;; init statics
+	clr Val00		; r0 = 00
+	clr Val01
+	inc Val01		; r1 = 01
+	clr ValFF
+	dec ValFF		; r2 = ff
 
 	ldi r16, lo8(RAMSTART)	; r5:4 == RAMSTART
 	ldi r17, hi8(RAMSTART)
-	movw r4, r16
+	movw MemBase, r16
 	ldi r16, lo8(pitch)	; r7:6 == Pitch
 	ldi r17, hi8(pitch)
-	movw r6, r16
+	movw MemPitch, r16
 	ldi r16, lo8(duration)	; r9:8 == Duration
 	ldi r17, hi8(duration)
-	movw r8, r16
+	movw MemDuration, r16
 	ldi r16, lo8(toc)	; r11:10 == toc
 	ldi r17, hi8(toc)
-	movw r10, r16
-	;; scratch registers: r12-r15, r20-r25
+	movw MemTOC, r16
 
-	;; SREG
-	ldi r16,0
+	ldi r16, 0x00		; SREG = 0x00
 	out SREG,r16
 
 	rjmp mainReset
@@ -207,10 +216,10 @@ INT_0:				; ISR Button
 	rjmp mainInt0
 
 INT0Enable:
-	sts EICRA, r1
+	out EIMSK, Val01
 	ret
 INT0Disable:
-	sts EICRA, r0
+	out EIMSK, Val00
 	ret
 
 ;;; ========================================================================
@@ -222,8 +231,8 @@ INT_Timer:			; ISR Duration Timer
 	push r16
 
 	in r17, SREG
-	movw r30, r4		; memBase
-	std Z + memIntTimer, r2	; 0xff
+	movw r30, MemBase
+	std Z + memIntTimer, ValFF
 	ldd r16, Z + memIntTimerCnt
 	inc r16
 	std Z + memIntTimerCnt, r16
@@ -250,7 +259,9 @@ PowerDown:
 	
 	ldi r20, 0x05
 	out SMCR, r20		; sleep mode: power down mode
-	ret
+_PowerDown0:
+	sleep
+	rjmp _PowerDown0	; only INT0 can wake up and reinitialize
 	
 ;;; ========================================================================
 ;;; common routines

@@ -48,7 +48,7 @@
 
 <table>
   <tr><th></th><th>ATmega328P (Arduino Uno rev3)</th><th>ATtiny45</th></tr>
-  <tr><th>Clock</th><td>extern 16MHZ</td><td>intern 1MHz</td></tr>
+  <tr><th>Clock</th><td>extern 16MHz</td><td>intern 1MHz</td></tr>
   <tr><th>Power</th><td>5V</td><td>3V - 5V</td></tr>
   <tr><th>Speaker</th><td>Pin 12 (Port D6 / <b>OC0A</b>, Arduino Pin 6)</td><td>Pin 5 (Port B0 / <b>OC0A</b>)</td></tr>
   <tr><th>NextButton</th><td>Pin  4 (Port D2 / <b>INT0</b>, Arduino Pin 2)</td><td>Pin 7 (Port B2 / <b>INT0</b>)</td></tr>
@@ -120,6 +120,7 @@ converting it to assember tables.</p>
   <li>http://www.atmel.com/Images/Atmel-0856-AVR-Instruction-Set-Manual.pdf</li>
 </ul>
 <ul>
-  <li>https://github.com/Musikpiraten/public-domain-season-songs</li>
-  <li>https://gcc.gnu.org/wiki/avr-gcc (not used)</li>
+  <li>http://www.lilypond.org/</li>
+  <li>https://github.com/Musikpiraten/public-domain-season-songs/</li>
+  <li>https://gcc.gnu.org/wiki/avr-gcc/ (not used)</li>
 </ul>

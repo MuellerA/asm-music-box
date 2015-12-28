@@ -27,7 +27,7 @@ mainInt0:
 	cli
 	rcall INT0Enable
 
-	movw r28, r4		; memBase
+	movw r28, MemBase
 	ldi r19, MAX_SONGS	; sleep count
 
 	ldd r16, Y + memInt0Cnt ; irq cnt >= 3 -> sleep
@@ -45,7 +45,7 @@ _mainInt00:
 	rjmp PowerDown
 
 mainReset:
-	movw r28, r4		; memBase
+	movw r28, MemBase
 
 	ldi r16, 0x00		; init irq cnt
 	std Y + memInt0Cnt, r16
@@ -53,8 +53,8 @@ mainReset:
 	ldi r19, MAX_SONGS	; sleep count
 
 _mainLoop0:	
-	std Y + memNextSongLo, r10 ; *memSong = toc
-	std Y + memNextSongHi, r11 
+	std Y + memNextSongLo, MemTOCLo ; *memNextSong = toc
+	std Y + memNextSongHi, MemTOCHi
 	;; no jump
 
 _mainLoop:
@@ -62,11 +62,11 @@ _mainLoop:
 	ldd r30, Y + memNextSongLo
 	ldd r31, Y + memNextSongHi
 	
-	lpm r16, z+		; get next song
-	lpm r17, z+
+	lpm r16, Z+		; get next song
+	lpm r17, Z+
 	mov r20, r17		; check if end of songs
 	and r20, r16
-	cp r20, r2		; 0xff
+	cp r20, ValFF
 	breq _mainLoop0
 
 	std Y + memNextSongLo, r30 ; set next song
@@ -81,7 +81,7 @@ _mainLoop:
 
 	dec r19
 	breq PowerDown
-	
+
 	ldi r16, 0xff		; pause
 	ldi r17, 0x00
 	rcall playNote
@@ -99,15 +99,15 @@ playSong:
 	push r16
 	
 	movw r30, r16
-	lpm r16, z+
+	lpm r16, Z+
 	sts OCRXA, r16		; set speed
-	lpm r16, z+		; skip padding
+	lpm r16, Z+		; skip padding
 _playSongLoop:	
-	lpm r16, z+
-	lpm r17, z+
+	lpm r16, Z+
+	lpm r17, Z+
 	mov r20, r17
 	and r20, r16
-	cp r20, r2		; 0xff
+	cp r20, ValFF
 	breq _playSongRet
 	rcall playSection
 	rjmp _playSongLoop
@@ -132,9 +132,9 @@ playSection:
 	
 	movw r30, r16		; song addr
 _playSectionLoop:
-	lpm r16, z+
-	lpm r17, z+
-	cp r17, r2		; 0xff
+	lpm r16, Z+
+	lpm r17, Z+
+	cp r17, ValFF
 	breq _playSectionRet
 	rcall playNote
 	rjmp _playSectionLoop
@@ -158,46 +158,46 @@ playNote:
 	push r17
 	push r16
 	
-	cp r16, r2		; 0xff
+	cp r16, ValFF
 	breq _playNotePause
 
 _playNotePitch:
 	lsl r16
-	movw r30, r6		; Pitch
+	movw r30, MemPitch
 	add r30, r16
-	adc r31, r0		; 0x00
+	adc r31, Val00
 
-	lpm r16, z+		; div
+	lpm r16, Z+		; div
 	out TCCR0B, r16
-	lpm r16, z+		; cnt
+	lpm r16, Z+		; cnt
 	out OCR0A, r16
 
 	rjmp _playNoteDuration
 
 _playNotePause:
-	mov r16, r0		; 0x00
+	mov r16, Val00
 	out TCCR0B, r16		; disable timer
 	out OCR0A, r16
 
 _playNoteDuration:
 	lsl r17
 	lsl r17
-	movw r30, r8		; Duration
+	movw r30, MemDuration
 	add r30, r17
-	adc r31, r0		; 0x00
+	adc r31, Val00
 
-	lpm r16, z+		; ON
-	lpm r17, z+
+	lpm r16, Z+		; ON
+	lpm r17, Z+
 	rcall waitForTimer		
 
-	lpm r16, z+		; OFF
-	lpm r17, z+
+	lpm r16, Z+		; OFF
+	lpm r17, Z+
 
 	mov r20, r16
 	or  r20, r17
 	breq _playNoteRet
 	
-	mov r20, r0		; 0x00
+	mov r20, Val00
 	out TCCR0B, r20		; disable timer
 	out OCR0A, r20
 
@@ -223,16 +223,16 @@ waitForTimer:
 	or r20, r25
 	breq _waitForTimerRet
 
-	movw r30, r4		; memBase
+	movw r30, MemBase
 _waitForTimerLoop1:		; Timer interrupt but ctr not 0
 	cli
-	std Z + memIntTimer, r0 	; 0x00
+	std Z + memIntTimer, Val00
 _waitForTimerLoop2:		; non Timer interrupt received
 	sei
 	sleep
 	cli
 	ldd r20, Z + memIntTimer
-	cp r20, r0		; 0x00
+	cp r20, Val00
 	breq _waitForTimerLoop2
 	sei
 	sbiw r24, 1

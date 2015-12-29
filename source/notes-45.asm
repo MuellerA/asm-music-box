@@ -12,7 +12,7 @@ pitch:
 .byte 0x03, 0x4b ; [08] GIS_0  103.83
 .byte 0x03, 0x47 ; [09] A_0    110.00
 .byte 0x03, 0x43 ; [0a] AIS_0  116.54
-.byte 0x03, 0x3f ; [0b] H_0    123.47
+.byte 0x03, 0x3f ; [0b] B_0    123.47
 .byte 0x03, 0x3b ; [0c] C_1    130.81
 .byte 0x03, 0x38 ; [0d] CIS_1  138.59
 .byte 0x03, 0x35 ; [0e] D_1    146.83
@@ -24,7 +24,7 @@ pitch:
 .byte 0x03, 0x25 ; [14] GIS_1  207.65
 .byte 0x03, 0x23 ; [15] A_1    220.00
 .byte 0x03, 0x21 ; [16] AIS_1  233.08
-.byte 0x02, 0xfd ; [17] H_1    246.94
+.byte 0x02, 0xfd ; [17] B_1    246.94
 .byte 0x02, 0xee ; [18] C_2    261.63
 .byte 0x02, 0xe1 ; [19] CIS_2  277.18
 .byte 0x02, 0xd4 ; [1a] D_2    293.66
@@ -36,7 +36,7 @@ pitch:
 .byte 0x02, 0x96 ; [20] GIS_2  415.30
 .byte 0x02, 0x8e ; [21] A_2    440.00
 .byte 0x02, 0x86 ; [22] AIS_2  466.16
-.byte 0x02, 0x7e ; [23] H_2    493.88
+.byte 0x02, 0x7e ; [23] B_2    493.88
 .byte 0x02, 0x77 ; [24] C_3    523.25
 .byte 0x02, 0x70 ; [25] CIS_3  554.37
 .byte 0x02, 0x6a ; [26] D_3    587.33
@@ -48,7 +48,7 @@ pitch:
 .byte 0x02, 0x4b ; [2c] GIS_3  830.61
 .byte 0x02, 0x47 ; [2d] A_3    880.00
 .byte 0x02, 0x43 ; [2e] AIS_3  932.33
-.byte 0x02, 0x3f ; [2f] H_3    987.77
+.byte 0x02, 0x3f ; [2f] B_3    987.77
 .byte 0x02, 0x3b ; [30] C_4   1046.50
 .byte 0x02, 0x38 ; [31] CIS_4 1108.73
 .byte 0x02, 0x35 ; [32] D_4   1174.66
@@ -60,7 +60,19 @@ pitch:
 .byte 0x02, 0x25 ; [38] GIS_4 1661.22
 .byte 0x02, 0x23 ; [39] A_4   1760.00
 .byte 0x02, 0x21 ; [3a] AIS_4 1864.66
-.byte 0x01, 0xfd ; [3b] H_4   1975.53
+.byte 0x01, 0xfd ; [3b] B_4   1975.53
+.byte 0x01, 0xee ; [3c] C_5   2093.00
+.byte 0x01, 0xe1 ; [3d] CIS_5 2217.46
+.byte 0x01, 0xd4 ; [3e] D_5   2349.32
+.byte 0x01, 0xc8 ; [3f] DIS_5 2489.02
+.byte 0x01, 0xbd ; [40] E_5   2637.02
+.byte 0x01, 0xb2 ; [41] F_5   2793.83
+.byte 0x01, 0xa8 ; [42] FIS_5 2959.96
+.byte 0x01, 0x9f ; [43] G_5   3135.96
+.byte 0x01, 0x96 ; [44] GIS_5 3322.44
+.byte 0x01, 0x8e ; [45] A_5   3520.00
+.byte 0x01, 0x86 ; [46] AIS_5 3729.31
+.byte 0x01, 0x7e ; [47] B_5   3951.07
 duration:
 .byte 0xc0, 0x2b, 0x20, 0x03 ; [00] 1.0
 .byte 0x20, 0x03, 0xc0, 0x2b ; [00] 1.0 .

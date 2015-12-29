@@ -12,7 +12,7 @@ class Ly2Asm
 
   def initialize()
 
-    @ReNote = /(ces|cis|c|des|dis|d|ees|eis|e|fes|fis|f|ges|gis|g|aes|ais|a|bes|bis|b|r)([,'])?((?:64|32|16|8|4|2|1)\.?)?[\[\]]?([~\(\)])?/
+    @ReNote = /(ces|cis|c|des|dis|d|ees|eis|e|fes|fis|f|ges|gis|g|aes|ais|a|bes|bis|b|r)(,+|'+)?((?:64|32|16|8|4|2|1)\.?)?[\[\]]?([~\(\)])?/
 
     @Hoehe = {
       'c'   =>  0,
@@ -117,12 +117,12 @@ class Ly2Asm
           end
 
           case nOktav
-          when ','
-            hoehe0 = hoehe0 + deltaT - 12
-            hoehe  = hoehe  + deltaT - 12
-          when '\''
-            hoehe0 = hoehe0 + deltaT + 12
-            hoehe  = hoehe  + deltaT + 12
+          when /,+/
+            hoehe0 = hoehe0 + deltaT - 12 * nOktav.length
+            hoehe  = hoehe  + deltaT - 12 * nOktav.length
+          when /'+/
+            hoehe0 = hoehe0 + deltaT + 12 * nOktav.length
+            hoehe  = hoehe  + deltaT + 12 * nOktav.length
           when nil
             hoehe0 = hoehe0 + deltaT
             hoehe  = hoehe  + deltaT
@@ -161,17 +161,33 @@ Bourree =
     :speed => 150,
     :sections =>
     [
-      #1
-      %q[ d8( e8) |
-          f4 e8( d8) cis4 d8( e8) | a,4 b8( cis8) d4 c8( bes8) | a4 g8( f8) e4 f8( g8) | a8( g8 f8 e8 d4) d'8( e8)  |
-          f4  e8( d8) cis4 d8( e8) | a,4 b8( cis8) d4 c8( bes8) | a4 g8( f8) e4. ],
-      #2             
-      %q[  f8 f2. ],
-      #3
-      %q[ d8 | d2.]
+      %q< d8( e8) f4 e8( d8) cis4 d8( e8) | a,4 b8( cis8) d4 c8( bes8) | a4 g8( f8) >,
+      %q< e4 f8( g8) | a8( g8 f8 e8 d4) >,
+      %q< e4. f8 | f2. >,
+      %q< e4. d8 | d2. >,
     ],
-    :order => [1,2,1,2,1,3]
+    :order => [ 1, 2, 1, 3, 1, 2, 1, 4 ]
   }
+
+Menuett =
+  {
+  :title => 'Menuett',
+  :speed => 170,
+  :sections =>
+  [
+    %q< d4 g,8( a) b c d4 g, g e' c8( d) e fis g4 g, g
+        c d8( c) b a b4 c8( b) a g >,
+    %q< fis4 g8( a) b g b4 a2 >,
+    %q< a4 b8( a) g fis g2. >,
+
+    %q< b'4 g8( a) b g a4 d,8( e) fis d g4 e8( fis) g d cis4 b8( cis) a4
+        a8( b) cis d e fis g4 fis e fis a, cis d2.
+        d4 g,8( fis) g4 e'4 g,8( fis) g4 d' c b a8( g) fis g a4
+        d,8( e) fis g a b c4 b a b8( d) g,4 fis4 g2. >
+  ],
+  :order => [ 1, 2, 1, 3, 1, 2, 1, 3, 4, 4 ]
+}
+
 
 Entertainer = 
   {
@@ -200,6 +216,46 @@ Entertainer =
     ],
     :order => [1, 2, 4, 2, 5, 3, 5, 3, 4, 2, 6 ]
   }
+
+Morgenstemning =
+  {
+    :title => 'Morgenstemning',
+    :speed => 160,
+    :sections =>
+    [
+      %q< g'4( e d c d e) g( e d c d e) g( e g a e a g e d c2.)
+          g4( e d c d e) g( e d c d e) g( e g a e a b gis fis e2.)
+          b'4( gis fis e fis gis) b( gis fis e fis gis) b( gis b c gis c b gis fis e2.)
+          b'4( gis fis e fis gis) b( gis fis e fis gis) b( gis b c a c d b a g2.)
+          d'4( b a g a b) d( b a g a b) d(4 b g) r2. d'4(b g) r2. g'4( e d c d e)
+          g( e d c d e) g( e g a e a) a( f e d2.) a4( f e d e f) a( f e d e f)
+          a( f a) b( f b) b( g b) c( g c) c( a c) d( a d) e1. d2. c2.
+          b1. g4( e d c d e) g( e d c d e) g( e g) a( e a
+          g e d c2.) g''4( e d c d e) g( e d c d e) g( e d c d e g1 c1.) >
+
+    ],
+    :order => [ 1 ]
+  }
+
+UngarischerTanzNr5 =
+{
+  :title => 'UngarischerTanzNr5',
+  :speed => 170,
+  :sections =>
+  [
+    %q< e4.( a8) | c4.( a8) | gis4.( a16 b16) | a2 |
+        f4.( g16 a16) | e2 | d16( c16) c16( b16) c8.( e16) | a,2 |
+        e'4.( a16 c16) | e4.( c8) | b4.( c16 d16) | c2 |
+        f16 g16 a16 f16 e16 f16 g16 e16 | d16 e16 f16 d16 c16 d16 e16 c16 |
+        d16( c16) c16( b16) b8.( e16) | a,4 a'8 r8 >,
+    %q< e4 e4 | f4.( e8) | r8 d4 cis16 d16 | e16 d16 cis16 e16 d8 r8 |
+        d4 d4 e4.( d8) | r8 c4 b16 c16 | d16 c16 b16 d16 c8 r8 | b4 b4 |
+        d8 c4 b8~ | b8 a4 gis16( a16) | b16 a16 gis 16 b16 a4 | e'8 r8 r8. e,16 |
+        fis8 r8 gis8 r8 | a8 a4 gis16( a16) | b16 a16 gis16 b16 a8 r8 >
+  ],
+  :order => [ 1, 2, 1 ]
+}
+
 
 ################################################################################
 # Weihnachtslieder von https://github.com/Musikpiraten/public-domain-season-songs
@@ -254,7 +310,8 @@ JosephLieberjosephMein =
     :sections =>
     [
       %q< c4 a8 f4 a8 | c4 d8 c4. | c4 a8 f4 a8 | c4 d8 c4. | bes4 bes8 bes4 c8 |
-          bes4 a8 g4 a8 | c4 a8 f4 a8 | g4 f8 g4 a8 | f4. f4.>
+          bes4 a8 g4 a8 | c4 a8 f4 a8 | g4 f8 g4 a8 | f4. f4.
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -268,7 +325,8 @@ KlingGloeckchenKlingelingeling =
       %q< c2 a4 bes4 c8 d c d c2 bes g4 c a1
           g4 g a f a2 g bes4 bes c g bes2 a
           g4 g a b c2 g a4 d c b d2 c 
-          c2 a4 bes4 c8 d c d c2 bes g4 c a1>
+          c2 a4 bes4 c8 d c d c2 bes g4 c a1
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -282,7 +340,8 @@ JingleBells =
       %q< d8 b' a g d4. d16 d d8 b' a g e2 e8 c' b a fis2 d'8 d c a b2 d,8 b' a g d2 
           d8 b' a g e4. e8 e c' b a d d d d e d c a g4 r b8 b b4 b8 b b4 b8 d g,8. a16 
           b2 c8 c c8. c16 c8 b b b16 b b8 a a b a4( d) b8 b b4 b8 b b4 b8 d g,8. a16 
-          b2 c8  c c8. c16 c8 b b b16 b d8 d c a g2>
+          b2 c8  c c8. c16 c8 b b b16 b d8 d c a g2
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -302,7 +361,8 @@ LasstUnsFrohUndMunterSein =
           d4 a4 a8[ b8] a8[ g8]
           fis4 e4 a2
           d4 a4 a8[ b8] a8[ g8]
-          fis4 e4 d2>
+          fis4 e4 d2
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -332,7 +392,8 @@ WeWishYouAMerryChristmas =
     [
       %q< a4 d d8 e d cis b4 b b e e8 fis e d cis4 a a fis' fis8 g fis e d4 b a8 a 
           b4 e cis d2 a4 d d d cis2 cis4 d4  cis b a2 e'4 fis e8 e d d a'4
-          fis a,8 a b4 e cis d2 >
+          fis a,8 a b4 e cis d2
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -363,7 +424,8 @@ EsIstEinRosEntsprungen =
     [
       %q< c2 c4 c d c c2 a bes a4 g~ g f2 e4  f2 c'
           c4 c d c c2 a bes a4 g~ g f2 e4 f2 r4 a
-          g4 e f d c2. r4 c' c c d c c2 a bes a4 g~ g f2 e4 f2 >
+          g4 e f d c2. r4 c' c c d c c2 a bes a4 g~ g f2 e4 f2
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -378,7 +440,8 @@ KommetIhrHirten =
           c4 a8[( c)] g[( a)] | f2. >,
       %q< f4 a8 f a c | f,4 a8 f g c, |
           f4 a8 f a c | f,4 a8 f g c, |
-          c'4 a8[( c)] g[( a)] | f2. >
+          c'4 a8[( c)] g[( a)] | f2.
+          r4 >
     ],
     :order => [ 1, 1, 2, 1, 1, 2 ]
   }
@@ -410,7 +473,8 @@ MachtHochDieTuer =
           c2 bes4 c2 bes4 | c( bes) aes g2 bes4 |
           c2 bes4 c2 bes4 | c( bes) aes g2 bes4 |
           ees,2 ees4 aes2 g4 | f2.~ f2 bes4 |
-          aes2 g4 f( ees) f | ees2.~ ees2 >
+          aes2 g4 f( ees) f | ees2.~ ees2
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -423,7 +487,8 @@ MorgenKommtDerWeihnachtsmann =
     [
       %q< g4 g d' d e e d2 c4 c b b a2 g
           d'4 d c c b b a2 d4 d c c b b a2
-          g4 g d' d e e d2 c4 c b b a2 g >
+          g4 g d' d e e d2 c4 c b b a2 g
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -437,7 +502,8 @@ MorgenKinderWirdsWasGeben =
       %q< g'4 d e d | e8( g) fis( a) g4 d |
           b' b8( c) d4 b | c b a2 | >,
       %q< c4 c e e | a, a d2 |
-          g,4 g c c | b8( a) g( fis) g2 >
+          g,4 g c c | b8( a) g( fis) g2
+          r4 >
     ],
     :order => [ 1, 1, 2, 1, 1, 2 ]
   }
@@ -451,7 +517,8 @@ ODuFroehliche =
       %q< a'2 b | a4. g8 fis4( g) | a2 b | a4. g8 fis4( g) |
           a2 a | b cis4 d | cis2 b | a1 |
           e4.( fis8) e4 fis | g4.( a8) g2 | fis4.( g8) fis4 g | a4.( b8) a2 |
-          d4( cis) b( a) | d b a g | fis2 e | d1 >
+          d4( cis) b( a) | d b a g | fis2 e | d1
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -465,7 +532,8 @@ OTannenbaum =
       %q< c f8. f16 f4. g8 a8. a16 a4. a8 g8 a bes4 e
           g f r8 c' c a d4. c8 c bes bes4. bes8
           bes g c4. bes8 bes a a4. c,8 f8. f16 f4. g8
-          a8. a16 a4. a8 g8 a bes4 e g f2 >
+          a8. a16 a4. a8 g8 a bes4 e g f2
+          r4 >
     ],
     :order => [ 1, 1 ]
   }
@@ -498,9 +566,10 @@ TochterZionFreueDich =
       %q< g8([ f g aes] g4) g | f2 ees |
           aes4( g f) ees | d1 |
           ees8([ d ees f] ees4) ees | c'2 a |
-          bes4( c8[ bes] a4.) bes8 | bes1 >
+          bes4( c8[ bes] a4.) bes8 | bes1 >,
+      %q< r4 >
     ],
-    :order => [ 1, 2, 1, 1, 2, 1 ]
+    :order => [ 1, 2, 1, 3, 1, 2, 1, 3 ]
   }
 
 VomHimmelhochDaKommIchHer =
@@ -547,6 +616,75 @@ ZuBethlehemGeboren =
     :order => [ 1, 1 ]
   }
 
+EsKommtEinSchiffGeladen =
+  {
+    :title => 'EsKommtEinSchiffGeladen',
+    :speed => 180,
+    :sections =>
+    [
+      %q< d4 d2 d4 e2 e4 f( g a) a2 a4 g2 g4 d2 e4      
+          f2. f4 a4 c d d c8[( bes a g]) f4 g a4 g f e d2
+          r4 >
+    ],
+    :order => [ 1, 1 ]
+  }
+
+InDulciJubilo =
+  {
+    :title => 'InDulciJubilo',
+    :speed => 130,
+    :sections =>
+    [
+      %q< f4 f2 f4 a2 bes4 c2( d4 c2) c4 f,2 f4 a2 bes4 c2( d4 c2.)
+          c2 d4 c2 bes4 a2. f2 f4 g2 g4 a2 g4 f2(g4 a2) a4
+          c2 d4 c2 bes4 a2. f2 f4 g2 g4 a2 g4 f2( g4 a2) r4
+          d,2 d4 e2 e4 f2.( c'2.) a2 a4 g2 g4 f2.( f2)
+          r4  >
+    ],
+    :order => [ 1, 1 ]
+  }
+
+MorgenKommteDerWeihnachtsmann =
+  {
+    :title => 'MorgenKommteDerWeihnachtsmann',
+    :speed => 150,
+    :sections =>
+    [
+      %q< g4 g d' d e e d2 c4 c b b a2 g
+          d'4 d c c b b a2 d4 d c c b b a2
+          g4 g d' d e e d2 c4 c b b a2 g
+          r4 >
+    ],
+    :order => [ 1, 1 ]
+  }
+
+Schneefloeckchen =
+  {
+    :title => 'Schneefloeckchen',
+    :speed => 150,
+    :sections =>
+    [
+      %q< g4 g4  b4 c4 a4 a4 b8 (c8)
+          d4 d4 e4 d4 r4 r8 g,8 d'4 b4 g4
+          e4 g4 r8 a8 fis4 fis4 a4 g4. r4 r8 >
+    ],
+    :order => [ 1 ]
+  }
+
+  StillStillStill =
+  {
+    :title => 'StillStillStill',
+    :speed => 200,
+    :sections =>
+    [
+      %q< c4( f4) a,4( c4) f,4 f8( a8) g4 g8( bes8)
+          e4 e8( g8) f4 r8 f8 g4 g8( a8) bes4 g4
+          a4 a8( bes8) c4 a4 g4 g8( a8) bes4 g4 a4 a8( bes8) c4 a4
+          c4( f4) a,4( c4) f,4 f8( a8) g4 g8( bes8) e4 e8( g8) f4 r4 >
+    ],
+    :order => [ 1, 1 ]
+  }
+
 ################################################################################
 # main
 ################################################################################
@@ -558,10 +696,14 @@ ly2asm = Ly2Asm.new
 
 [
   # Songs
-#  Bourree,
-#  Entertainer,
-  
-  # Weihnachtslieder
+  Bourree,
+  Menuett,
+  Entertainer,
+  Morgenstemning,
+  UngarischerTanzNr5,
+].each { |song| ly2asm.convert(song) }
+
+[ # Weihnachtslieder
   FroehlicheWeihnachtUeberall,
   AlleJahreWieder,
   IhrKinderleinKommet,
@@ -584,7 +726,17 @@ ly2asm = Ly2Asm.new
   VomHimmelhochDaKommIchHer,
   WasSollDasBedeuten,
   ZuBethlehemGeboren,
-].each { |song| ly2asm.convert(song) }
+  EsKommtEinSchiffGeladen,
+  InDulciJubilo,
+  MorgenKommteDerWeihnachtsmann,
+  Schneefloeckchen,
+  StillStillStill,
+]# .each { |song| ly2asm.convert(song) }
+
+LocalData = 'Ly2Asm.local.rb' # data not part of the git repository
+if (File.exist?(LocalData))
+  eval(File.read(LocalData)).each { |song| ly2asm.convert(song) }
+end
 
 ly2asm.toc()
 

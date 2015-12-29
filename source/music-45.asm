@@ -56,6 +56,8 @@ RESET:
 	ldi r16,hi8(RAMEND)
 	out SPH,r16 		; Stack Pointer high ramend
 
+	ldi r17, 0x00
+	
 	;; enable INT0
 	ldi r16, 0x40
 	out GIMSK, r16
@@ -69,8 +71,7 @@ RESET:
 	;; Timer0: Clear Timer on Compare mode
 	ldi r16, (0<<COM0A1)|(1<<COM0A0) | (1<<WGM01)|(0<<WGM00)
 	out TCCR0A, r16
-	ldi r16, 0
-	out TCCR0B, r16
+	out TCCR0B, r17
 
 	;; Timer1: div1 prescale
 	ldi r16, (0<<COM1A1)|(0<<COM1A0) | (0<<CS13)|(0<<CS12)|(0<<CS11)|(1<<CS10)
@@ -87,8 +88,7 @@ RESET:
 	out DDRB, r16
 	ldi r16, (1<<PIN_BTN)
 	out PORTB, r16
-	ldi r16, 0x00
-	out PCMSK, r16
+	out PCMSK, r17
 
 	;; power save
 	ldi r16, (1<<PRUSI)|(1<<PRADC)
@@ -119,8 +119,7 @@ RESET:
 	ldi r17, hi8(toc)
 	movw MemTOC, r16
 
-	ldi r16, 0x00		; SREG = 0x00
-	out SREG,r16
+	out SREG, r17		; SREG = 0x00
 
 	rjmp mainReset
 

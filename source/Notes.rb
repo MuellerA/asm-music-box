@@ -20,7 +20,7 @@ end
 # Hoehe
 ################################################################################
 
-Octav = %w{ C CIS D DIS E F FIS G GIS A AIS H }
+Octav = %w{ C CIS D DIS E F FIS G GIS A AIS B }
 
 class Note
   def initialize(name, freq)
@@ -41,7 +41,7 @@ delta = 2.0 ** (1.0/12.0)
 
 freq = (aHz / delta ** 10.0) / 4.0 # deepest note c_0
 
-(0..4).each do |octav|
+(0..5).each do |octav|
   Octav.each do |tonName|
     name = "%s_%d" % [tonName, octav]
     freq *= delta

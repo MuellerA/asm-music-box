@@ -59,7 +59,7 @@
 If you don't want to compile yourself, upload the included .hex file with avrdude.
 <ul>
   <li>If you don't have a 'make' get and install it (http://gnuwin32.sourceforge.net/packages/make.htm)</li>
-  <li>You need Ruby if you want to want to recreate the generated .asm files (https://www.ruby-lang.org/)</li>
+  <li>You need Ruby if you want to recreate the generated .asm files (https://www.ruby-lang.org/)</li>
   <li>Open command line box, change directory to where this files are located</li>
   <li>Check the settings at the top of the 'Makefile'</li>
   <li>Run 'make' to create the hex file</li>

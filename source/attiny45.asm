@@ -2,28 +2,11 @@
 ;;;     see LICENSE.md
 
 ;;; ========================================================================
-;;; music-45.asm - main file for ATtiny45
+;;; attiny45.asm - main file for ATtiny45
 ;;; ========================================================================
 
-	.include "ATtiny45-port.asm"
-
-	.equ OCRXA, OCR1A+32
-	.equ PIN_SPK, 0		; PB0/MOSI/DI/SDA/AIN0/OC0A/OC1A/AREF/PCINT0
-	.equ PIN_BTN, 2		; PB2/SCK/USCK/SCL/ADC1/T0/INT0/PCINT2
-	.equ PIN_LED, 4		; PB4
-
-	;; Register statics, aliases
-	.equ Val00, 0
-	.equ Val01, 1
-	.equ ValFF, 2
-	.equ MemBase, 4
-	.equ MemPitch, 6
-	.equ MemDuration, 8
-	.equ MemTOC, 10
-	.equ MemTOCLo, 10
-	.equ MemTOCHi, 11
-
-	;; scratch registers: r12-r15, r20-r25
+	.include "attiny45.inc"
+	.include "main.inc"
 
 ;;; ========================================================================
 ;;; interrupt table
@@ -142,6 +125,7 @@ INT_0:				; ISR Button
 
 	rjmp mainInt0
 
+	.global INT0Enable
 INT0Enable:
 	push r16
 	in r16, GIMSK
@@ -149,6 +133,7 @@ INT0Enable:
 	out GIMSK, r16
 	pop r16
 	ret
+	.global INT0Disable
 INT0Disable:
 	push r16
 	in r16, GIMSK
@@ -187,7 +172,7 @@ _INT_TimerRet:
 ;;; ========================================================================
 ;;; SoC specific routines
 ;;; ========================================================================
-
+	.global PowerDown
 PowerDown:	
 	ldi r20, 0x00		; set all pins to input
 	out DDRB, r20
@@ -200,24 +185,6 @@ _PowerDown0:
 	sleep
 	rjmp _PowerDown0	; only INT0 can wake up and reinitialize
 
-;;; ========================================================================
-;;; common routines
-;;; ========================================================================
-
-.include "music-main.asm"
-
-;;; ========================================================================
-;;; SoC specific generated data
-;;; ========================================================================
-
-.include "notes-45.asm"
-
-;;; ========================================================================
-;;; common generated data
-;;; ========================================================================
-
-.include "music-data.asm"
-	
 ;;; ========================================================================
 ;;; EOF
 ;;; ========================================================================

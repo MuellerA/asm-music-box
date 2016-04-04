@@ -1,64 +1,55 @@
 
 AVRDIR	= d:\Programme\Arduino\hardware\tools\avr
-MMCU328	= atmega328p
-MMCU45	= attiny45
-BAUD328 = 115200
-#BAUD328 = 19200
-BAUD45	= 19200
-PORT	= COM3
-PROG328 = arduino
-#PROG328 = stk500v1
-PROG45  = stk500v1
+
+#MMCU	?= atmega328p
+MMCU	?= attiny45
+PORT	?= COM6
+
+ifeq ($(MMCU),attiny45)
+PROG	= stk500v1
+BAUD	= 19200
+ERASE	= 
+else
+PROG	= arduino
+BAUD	= 115200
+ERASE	= -D
+endif
 
 # nothing to be configured below
 
-FILESCommon = music-data.asm music-main.asm
-FILES328    = music-328.asm ATmega368-port.asm notes-328.asm $(FILESCommon)
-FILES45     = music-45.asm  ATtiny45-port.asm  notes-45.asm  $(FILESCommon)
+ALL:	$(MMCU).hex
 
-ALL:	music-328.328.hex music-45.45.hex
+Upload: $(MMCU).hex
+	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU) -c $(PROG) -P $(PORT) -b $(BAUD) $(ERASE) -U flash:w:$<:i
 
-Upload328: music-328.328.hex
-	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU328) -c $(PROG328) -P $(PORT) -b $(BAUD328) -D -U flash:w:$<:i
+ReadFuses:
+	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU) -c $(PROG) -P $(PORT) -b $(BAUD) -U lfuse:r:lfuse.$(MMCU).hex:i -U hfuse:r:hfuse.$(MMCU).hex:i -U efuse:r:efuse.$(MMCU).hex:i
 
-Upload45: music-45.45.hex
-	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U flash:w:$<:i
-
-ReadFuses328:
-	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU328) -c $(PROG328) -P $(PORT) -b $(BAUD328) -U lfuse:r:lfuse328.hex:i -U hfuse:r:hfuse328.hex:i -U efuse:r:efuse328.hex:i
-
-ReadFuses45:
-	$(AVRDIR)\bin\avrdude -v -C $(AVRDIR)\etc\avrdude.conf -p $(MMCU45) -c $(PROG45) -P $(PORT) -b $(BAUD45) -U lfuse:r:lfuse45.hex:i -U hfuse:r:hfuse45.hex:i -U efuse:r:efuse45.hex:i
-
-notes-328.asm: Notes.rb
+notes.atmega328p.asm: Notes.rb
 	ruby Notes.rb 16000000 8000 > $@
 
-notes-45.asm: Notes.rb
+notes.attiny45.asm: Notes.rb
 	ruby Notes.rb 1000000 4000 > $@
 
-music-data.asm: Ly2Asm.rb
+songs.asm: Ly2Asm.rb
 	ruby Ly2Asm.rb > $@
 
-music-328.328.o: $(FILES328)
-	$(AVRDIR)\bin\avr-as -g -mmcu=$(MMCU328) -o $@ $<
+$(MMCU).o: $(MMCU).inc
 
-music-45.45.o: $(FILES45)
-	$(AVRDIR)\bin\avr-as -g -mmcu=$(MMCU45) -o $@ $<
+main.$(MMCU).o: main.asm main.inc
+	$(AVRDIR)\bin\avr-as -g -mmcu=$(MMCU) -defsym __$(MMCU)__=1 -o $@ $<
 
-%.328.elf: %.328.o 
-	$(AVRDIR)\bin\avr-ld -o $@ $<
+%.o:	%.asm
+	$(AVRDIR)\bin\avr-as -g -mmcu=$(MMCU) -defsym __$(MMCU)__=1 -o $@ $<
 
-%.45.elf: %.45.o
-	$(AVRDIR)\bin\avr-ld -o $@ $<
+$(MMCU).elf: $(MMCU).o main.$(MMCU).o notes.$(MMCU).o songs.o
+	$(AVRDIR)\bin\avr-ld -o $@ $(MMCU).o main.$(MMCU).o notes.$(MMCU).o songs.o
 
-%.328.hex: %.328.elf
-	$(AVRDIR)\bin\avr-objcopy -O ihex -R .eeporm $< $@
-
-%.45.hex: %.45.elf
+%.hex:	%.elf
 	$(AVRDIR)\bin\avr-objcopy -O ihex -R .eeporm $< $@
 
 Clean:
-	del *.o *.elf *.hex music-data.asm notes-328.asm notes-45.asm *~
+	del *.o *.elf *.hex songs.asm notes.*.asm *~
 
 Help:
 	@echo 'make [UploadNNN] [Clean] [ReadFusesNNN] [Help]'

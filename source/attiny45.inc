@@ -2,7 +2,7 @@
 ;;;     see LICENSE.md
 
 ;;; ========================================================================
-;;; ATtiny48 Ports
+;;; ATtiny45 Ports
 ;;; ========================================================================
 
 	.equ ROMEND, 0x7ff
@@ -80,4 +80,12 @@
 	.equ PRTIM0, 2  ; Power Reduction Timer/Counter0
 	.equ PRUSI,  1  ; Power Reduction USI
 	.equ PRADC,  0  ; Power Reduction ADC
+
+;;; ========================================================================
 	
+	.equ OCRXA, OCR1A+32
+	.equ PIN_SPK, 0		; PB0/MOSI/DI/SDA/AIN0/OC0A/OC1A/AREF/PCINT0
+	.equ PIN_BTN, 2		; PB2/SCK/USCK/SCL/ADC1/T0/INT0/PCINT2
+	.equ PIN_LED, 4		; PB4
+
+;;; ========================================================================

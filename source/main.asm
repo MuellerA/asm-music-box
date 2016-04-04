@@ -2,14 +2,17 @@
 ;;;     see LICENSE.md
 
 ;;; ========================================================================
-;;; music-main.asm - common file
+;;; main.asm - common file
 ;;; ========================================================================
 
-	.equ memIntTimer,    0x00
-	.equ memIntTimerCnt, 0x01
-	.equ memNextSongLo,  0x02
-	.equ memNextSongHi,  0x03
-	.equ memInt0Cnt,     0x04
+	.ifdef __attiny45__
+	.include "attiny45.inc"
+	.endif
+	.ifdef __atmega328p__
+	.include "atmega328p.inc"
+	.endif
+
+	.include "main.inc"
 
 	.equ MAX_SONGS,      0x03 ; max songs before sleep
 	.equ IRQ_SLEEP_CNT,  0x02 ; min int0 intervals to sleep
@@ -18,6 +21,7 @@
 ;;; main
 ;;; ========================================================================
 
+	.global mainInt0
 mainInt0:
 	ldi r16, 0xff		; pause
 	ldi r17, 0x08
@@ -44,6 +48,7 @@ _mainInt00:
 	std Y + memInt0Cnt, r16
 	rjmp PowerDown
 
+	.global mainReset
 mainReset:
 	movw r28, MemBase
 

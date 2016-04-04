@@ -717,6 +717,7 @@ UngarischerTanzNr5Data2:
 	.byte 0xff, 0x1a ; [ 59] -    8
 	.word 0xffff     ; return
 
+	.global toc
 toc:
 	.word BourreeToc	; 0
 	.word MenuettToc	; 1

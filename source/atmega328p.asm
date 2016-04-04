@@ -2,26 +2,11 @@
 ;;;     see LICENSE.md
 
 ;;; ========================================================================
-;;; music-328.asm - main file for ATmega328
+;;; atmega328p.asm - main file for ATmega328
 ;;; ========================================================================
 
-	.include "ATmega368-port.asm"
-
-	.equ OCRXA, OCR2A
-	.equ PIN_SPK, 6		; OC0A / Port D #6 / ARDUINO 6
-	.equ PIN_BTN, 2		; Int0 / Port D #2 / ARDUINO 2
-	.equ PIN_LED, 4		; Port B #4 / ARDUINO 12
-
-	;; Register statics, aliases
-	.equ Val00, 0
-	.equ Val01, 1
-	.equ ValFF, 2
-	.equ MemBase, 4
-	.equ MemPitch, 6
-	.equ MemDuration, 8
-	.equ MemTOC, 10
-	.equ MemTOCLo, 10
-	.equ MemTOCHi, 11
+	.include "atmega328p.inc"
+	.include "main.inc"
 	
 ;;; ========================================================================
 ;;; interrupt table
@@ -215,9 +200,12 @@ INT_0:				; ISR Button
 
 	rjmp mainInt0
 
+	.global INT0Enable
 INT0Enable:
 	out EIMSK, Val01
 	ret
+	
+	.global INT0Disable
 INT0Disable:
 	out EIMSK, Val00
 	ret
@@ -251,7 +239,7 @@ _INT_TimerRet:
 ;;; ========================================================================
 ;;; SoC specific routines
 ;;; ========================================================================
-
+	.global PowerDown
 PowerDown:
 	ldi r20, 0x00		; set all pins to input
 	out DDRB, r20
@@ -262,24 +250,6 @@ PowerDown:
 _PowerDown0:
 	sleep
 	rjmp _PowerDown0	; only INT0 can wake up and reinitialize
-	
-;;; ========================================================================
-;;; common routines
-;;; ========================================================================
-
-.include "music-main.asm"
-	
-;;; ========================================================================
-;;; SoC specific generated data
-;;; ========================================================================
-
-.include "notes-328.asm"
-
-;;; ========================================================================
-;;; common generated data
-;;; ========================================================================
-
-.include "music-data.asm"
 	
 ;;; ========================================================================
 ;;; EOF

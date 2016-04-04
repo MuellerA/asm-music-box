@@ -66,6 +66,7 @@ class Ly2Asm
   end
 
   def toc()
+    puts "\t.global toc"
     puts "toc:"
     @toc.each_with_index do |song, idx|
       puts "\t.word %sToc\t; %d" % [ song[:title], idx ]

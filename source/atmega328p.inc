@@ -133,3 +133,12 @@
 	.equ PRSPI, 2		; Power Reduction Serial Peripheral Interface
 	.equ PRUSART0, 1	; Power Reduction USART0
 	.equ PRADC, 0		; Power Reduction ADC
+
+;;; ========================================================================
+
+	.equ OCRXA, OCR2A
+	.equ PIN_SPK, 6		; OC0A / Port D #6 / ARDUINO 6
+	.equ PIN_BTN, 2		; Int0 / Port D #2 / ARDUINO 2
+	.equ PIN_LED, 4		; Port B #4 / ARDUINO 12
+
+;;; ========================================================================

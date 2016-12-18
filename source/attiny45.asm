@@ -67,10 +67,12 @@ RESET:
 	out TIMSK, r16
 
 	;; set ports
-	ldi r16, (1<<PIN_LED)|(1<<PIN_SPK)
-	out DDRB, r16
-	ldi r16, (1<<PIN_BTN)
-	out PORTB, r16
+	out DDRB, r17
+	out PORTB, r17
+	sbi DDR_SPK, IDX_SPK
+	sbi DDR_LED, IDX_LED
+	sbi PORT_BTN, IDX_BTN
+
 	out PCMSK, r17
 
 	;; power save
@@ -109,8 +111,8 @@ RESET:
 ;;; ========================================================================
 	
 INT_0:				; ISR Button
-	ldi r16, (1<<PIN_LED)|(1<<PIN_SPK)
-	out DDRB, r16
+	sbi DDR_LED, IDX_LED
+	sbi DDR_SPK, IDX_SPK
 	
 	in r16, MCUCR
 	andi r16, 0b11000111
@@ -118,10 +120,10 @@ INT_0:				; ISR Button
 	out MCUCR, r16
 
 	;; SP
-	ldi r16,lo8(RAMEND)
-	out SPL,r16 		; Stack Pointer Low ramend
-	ldi r16,hi8(RAMEND)
-	out SPH,r16 		; Stack Pointer high ramend
+	ldi r16, lo8(RAMEND)
+	out SPL, r16 		; Stack Pointer Low ramend
+	ldi r16, hi8(RAMEND)
+	out SPH, r16 		; Stack Pointer high ramend
 
 	rjmp mainInt0
 
@@ -145,28 +147,31 @@ INT0Disable:
 ;;; ========================================================================
 
 INT_Timer:			; ISR Duration Timer
-	push r31
-	push r30
-	push r17
-	push r16
+	timerCnt = 16
+	status = 17
+	
+	push ZH
+	push ZL
+	push status
+	push timerCnt
 
-	in r17, SREG
+	in status, SREG
 	out TCNT1, Val00
-	movw r30, MemBase
+	movw ZL, MemBase
 	std Z + memIntTimer, ValFF
-	ldd r16, Z + memIntTimerCnt
-	inc r16
-	std Z + memIntTimerCnt, r16
+	ldd timerCnt, Z + memIntTimerCnt
+	inc timerCnt
+	std Z + memIntTimerCnt, timerCnt
 	brne _INT_TimerRet
-	sbi PINB, PIN_LED
+	sbi PINB, IDX_LED
 
 _INT_TimerRet:
-	out SREG, r17
+	out SREG, status
 
-	pop r16
-	pop r17
-	pop r30
-	pop r31
+	pop timerCnt
+	pop status
+	pop ZL
+	pop ZH
 	reti
 
 ;;; ========================================================================

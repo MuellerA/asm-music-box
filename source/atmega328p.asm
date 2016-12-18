@@ -137,17 +137,16 @@ RESET:
 	;; disable spm
 
 	;; set ports
-	ldi r16, (1 << PIN_LED)
-	out DDRB, r16
-	ldi r16, 0x00
-	out PORTB, r16
-	out DDRC, r16
-	out PORTC, r16
-
-	ldi r16, 1<<PIN_SPK
-	out DDRD, r16
-	ldi r16, 1<<PIN_BTN
-	out PORTD, r16
+	ldi r17, 0
+	out DDRB, r17
+	out PORTB, r17
+	out DDRC, r17
+	out PORTC, r17
+	out DDRD, r17
+	out PORTD, r17
+	sbi DDR_LED, IDX_LED
+	sbi DDR_SPK, IDX_SPK
+	sbi PORT_BTN, IDX_BTN
 
 	;; power save
 	ldi r16, (1<<PRTWI)|(1<<PRTIM1)|(1<<PRSPI)|(1<<PRUSART0)|(1<<PRADC)
@@ -184,19 +183,17 @@ RESET:
 ;;; ========================================================================
 
 INT_0:				; ISR Button
-	ldi r16, (1 << PIN_LED)
-	out DDRB, r16
-	ldi r16, 1<<PIN_SPK
-	out DDRD, r16
+	sbi DDR_LED, IDX_LED
+	sbi DDR_SPK, IDX_SPK
 
 	ldi r16, 0x01
 	out SMCR, r16		; sleep mode: idle
 
 	;; SP
-	ldi r16,lo8(RAMEND)
-	out SPL,r16 		; Stack Pointer Low ramend
-	ldi r16,hi8(RAMEND)
-	out SPH,r16 		; Stack Pointer high ramend
+	ldi r16, lo8(RAMEND)
+	out SPL, r16 		; Stack Pointer Low ramend
+	ldi r16, hi8(RAMEND)
+	out SPH, r16 		; Stack Pointer high ramend
 
 	rjmp mainInt0
 
@@ -213,27 +210,29 @@ INT0Disable:
 ;;; ========================================================================
 	
 INT_Timer:			; ISR Duration Timer
-	push r31
-	push r30
-	push r17
-	push r16
+	timerCnt = 16
+	status = 17
+	push ZH
+	push ZL
+	push status
+	push timerCnt
 
-	in r17, SREG
-	movw r30, MemBase
+	in status, SREG
+	movw ZL, MemBase
 	std Z + memIntTimer, ValFF
-	ldd r16, Z + memIntTimerCnt
-	inc r16
-	std Z + memIntTimerCnt, r16
+	ldd timerCnt, Z + memIntTimerCnt
+	inc timerCnt
+	std Z + memIntTimerCnt, timerCnt
 	brne _INT_TimerRet
-	sbi PINB, PIN_LED
+	sbi PIN_LED, IDX_LED
 
 _INT_TimerRet:
-	out SREG, r17
+	out SREG, status
 	
-	pop r16
-	pop r17
-	pop r30
-	pop r31
+	pop timerCnt
+	pop status
+	pop ZL
+	pop ZH
 	reti
 
 ;;; ========================================================================

@@ -134,11 +134,22 @@
 	.equ PRUSART0, 1	; Power Reduction USART0
 	.equ PRADC, 0		; Power Reduction ADC
 
+	.equ ZH, 31
+	.equ ZL, 30
+	.equ YH, 29
+	.equ YL, 28
+	.equ XH, 27
+	.equ XL, 26
+	
 ;;; ========================================================================
 
 	.equ OCRXA, OCR2A
-	.equ PIN_SPK, 6		; OC0A / Port D #6 / ARDUINO 6
-	.equ PIN_BTN, 2		; Int0 / Port D #2 / ARDUINO 2
-	.equ PIN_LED, 4		; Port B #4 / ARDUINO 12
+	.equ DDR_SPK, DDRD
+	.equ IDX_SPK, 6		; OC0A / Port D #6 / ARDUINO 6
+	.equ DDR_LED, DDRB
+	.equ PIN_LED, PINB
+	.equ IDX_LED, 4		; Port B #4 / ARDUINO 12
+	.equ PORT_BTN, PORTD
+	.equ IDX_BTN, 2		; Int0 / Port D #2 / ARDUINO 2
 
 ;;; ========================================================================

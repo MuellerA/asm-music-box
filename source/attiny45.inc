@@ -81,11 +81,22 @@
 	.equ PRUSI,  1  ; Power Reduction USI
 	.equ PRADC,  0  ; Power Reduction ADC
 
+	.equ ZH, 31
+	.equ ZL, 30
+	.equ YH, 29
+	.equ YL, 28
+	.equ XH, 27
+	.equ XL, 26
+	
 ;;; ========================================================================
 	
 	.equ OCRXA, OCR1A+32
-	.equ PIN_SPK, 0		; PB0/MOSI/DI/SDA/AIN0/OC0A/OC1A/AREF/PCINT0
-	.equ PIN_BTN, 2		; PB2/SCK/USCK/SCL/ADC1/T0/INT0/PCINT2
-	.equ PIN_LED, 4		; PB4
+	.equ DDR_SPK, DDRB
+	.equ IDX_SPK, 0		; PB0/MOSI/DI/SDA/AIN0/OC0A/OC1A/AREF/PCINT0
+	.equ DDR_LED, DDRB
+	.equ PIN_LED, PINB
+	.equ IDX_LED, 4		; PB4
+	.equ PORT_BTN, PORTB
+	.equ IDX_BTN, 2		; PB2/SCK/USCK/SCL/ADC1/T0/INT0/PCINT2
 
 ;;; ========================================================================

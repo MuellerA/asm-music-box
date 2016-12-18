@@ -5,10 +5,9 @@
 ;;; main.asm - common file
 ;;; ========================================================================
 
-	.ifdef __attiny45__
+	.if MCU == 45
 	.include "attiny45.inc"
-	.endif
-	.ifdef __atmega328p__
+	.elseif MCU == 328
 	.include "atmega328p.inc"
 	.endif
 
@@ -23,6 +22,7 @@
 
 	.global mainInt0
 mainInt0:
+	songCnt = 19
 	ldi r16, 0xff		; pause
 	ldi r17, 0x08
 	rcall INT0Disable
@@ -31,8 +31,8 @@ mainInt0:
 	cli
 	rcall INT0Enable
 
-	movw r28, MemBase
-	ldi r19, MAX_SONGS	; sleep count
+	movw YL, MemBase
+	ldi songCnt, MAX_SONGS	; sleep count
 
 	ldd r16, Y + memInt0Cnt ; irq cnt >= 3 -> sleep
 	cpi r16, IRQ_SLEEP_CNT
@@ -50,12 +50,12 @@ _mainInt00:
 
 	.global mainReset
 mainReset:
-	movw r28, MemBase
+	movw YL, MemBase
 
 	ldi r16, 0x00		; init irq cnt
 	std Y + memInt0Cnt, r16
 	
-	ldi r19, MAX_SONGS	; sleep count
+	ldi songCnt, MAX_SONGS	; sleep count
 
 _mainLoop0:	
 	std Y + memNextSongLo, MemTOCLo ; *memNextSong = toc
@@ -64,8 +64,8 @@ _mainLoop0:
 
 _mainLoop:
 	cli
-	ldd r30, Y + memNextSongLo
-	ldd r31, Y + memNextSongHi
+	ldd ZL, Y + memNextSongLo
+	ldd ZH, Y + memNextSongHi
 	
 	lpm r16, Z+		; get next song
 	lpm r17, Z+
@@ -74,8 +74,8 @@ _mainLoop:
 	cp r20, ValFF
 	breq _mainLoop0
 
-	std Y + memNextSongLo, r30 ; set next song
-	std Y + memNextSongHi, r31
+	std Y + memNextSongLo, ZL ; set next song
+	std Y + memNextSongHi, ZH
 
 	ldi r20, 0x00		; reset irq cnt
 	std Y + memInt0Cnt, r20
@@ -84,7 +84,7 @@ _mainLoop:
 	
 	rcall playSong
 
-	dec r19
+	dec songCnt
 	breq PowerDown
 
 	ldi r16, 0xff		; pause
@@ -98,12 +98,12 @@ _mainLoop:
 ;;; ========================================================================
 
 playSong:
-	push r31
-	push r30
+	push ZH
+	push ZL
 	push r17
 	push r16
 	
-	movw r30, r16
+	movw ZL, r16
 	lpm r16, Z+
 	sts OCRXA, r16		; set speed
 	lpm r16, Z+		; skip padding
@@ -120,8 +120,8 @@ _playSongLoop:
 _playSongRet:		
 	pop r16
 	pop r17
-	pop r30
-	pop r31
+	pop ZL
+	pop ZH
 	ret
 	
 ;;; ========================================================================
@@ -130,12 +130,12 @@ _playSongRet:
 ;;; ========================================================================
 
 playSection:
-	push r31
-	push r30
+	push ZH
+	push ZL
 	push r17
 	push r16
 	
-	movw r30, r16		; song addr
+	movw ZL, r16		; song addr
 _playSectionLoop:
 	lpm r16, Z+
 	lpm r17, Z+
@@ -147,8 +147,8 @@ _playSectionLoop:
 _playSectionRet:
 	pop r16
 	pop r17
-	pop r30
-	pop r31
+	pop ZL
+	pop ZH
 	ret
 	
 ;;; ========================================================================
@@ -158,8 +158,8 @@ _playSectionRet:
 ;;; ========================================================================
 
 playNote:
-	push r31
-	push r30
+	push ZH
+	push ZL
 	push r17
 	push r16
 	
@@ -168,9 +168,9 @@ playNote:
 
 _playNotePitch:
 	lsl r16
-	movw r30, MemPitch
-	add r30, r16
-	adc r31, Val00
+	movw ZL, MemPitch
+	add ZL, r16
+	adc ZH, Val00
 
 	lpm r16, Z+		; div
 	out TCCR0B, r16
@@ -187,9 +187,9 @@ _playNotePause:
 _playNoteDuration:
 	lsl r17
 	lsl r17
-	movw r30, MemDuration
-	add r30, r17
-	adc r31, Val00
+	movw ZL, MemDuration
+	add ZL, r17
+	adc ZH, Val00
 
 	lpm r16, Z+		; ON
 	lpm r17, Z+
@@ -210,8 +210,8 @@ _playNoteDuration:
 _playNoteRet:	
 	pop r16
 	pop r17
-	pop r30
-	pop r31
+	pop ZL
+	pop ZH
 	ret
 
 ;;; ========================================================================
@@ -220,15 +220,15 @@ _playNoteRet:
 ;;; ========================================================================
 
 waitForTimer:	
-	push r31
-	push r30
+	push ZH
+	push ZL
 
 	movw r24, r16
 	mov r20, r24
 	or r20, r25
 	breq _waitForTimerRet
 
-	movw r30, MemBase
+	movw ZL, MemBase
 _waitForTimerLoop1:		; Timer interrupt but ctr not 0
 	cli
 	std Z + memIntTimer, Val00
@@ -244,8 +244,8 @@ _waitForTimerLoop2:		; non Timer interrupt received
 	brne _waitForTimerLoop1
 	
 _waitForTimerRet:
-	pop r30
-	pop r31
+	pop ZL
+	pop ZH
 	ret
 	
 ;;; ========================================================================

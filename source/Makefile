@@ -1,5 +1,10 @@
 
-AVRDIR	= d:\Programme\Arduino\hardware\tools\avr
+#AVRBIN	= d:\Programme\Arduino\hardware\tools\avr\bin
+#AVRETC	= d:\Programme\Arduino\hardware\tools\avr\etc
+#RM	= del
+AVRBIN	= /usr/bin
+AVRETC	= /etc
+RM	= rm -f
 
 #MCU	?= atmega328p
 MCU	?= attiny45
@@ -22,7 +27,7 @@ endif
 ALL:	$(MCU).hex
 
 Upload: $(MCU).hex
-	$(AVRDIR)\bin\avrdude -C $(AVRDIR)\etc\avrdude.conf -p $(MCU) -c $(PROG) -P $(PORT) -b $(BAUD) $(ERASE) -U flash:w:$<:i
+	$(AVRBIN)/avrdude -C $(AVRETC)/avrdude.conf -p $(MCU) -c $(PROG) -P $(PORT) -b $(BAUD) $(ERASE) -U flash:w:$<:i
 
 notes.atmega328p.asm: Notes.rb
 	ruby Notes.rb 16000000 8000 > $@
@@ -36,19 +41,19 @@ songs.asm: Ly2Asm.rb
 $(MCU).o: $(MCU).inc
 
 main.$(MCU).o: main.asm main.inc
-	$(AVRDIR)\bin\avr-as -g -mmcu=$(MCU) -defsym MCU=$(DEFSYM) -o $@ $<
+	$(AVRBIN)/avr-as -g -mmcu=$(MCU) -defsym MCU=$(DEFSYM) -o $@ $<
 
 %.o:	%.asm
-	$(AVRDIR)\bin\avr-as -g -mmcu=$(MCU) -defsym MCU=$(DEFSYM) -o $@ $<
+	$(AVRBIN)/avr-as -g -mmcu=$(MCU) -defsym MCU=$(DEFSYM) -o $@ $<
 
 $(MCU).elf: $(MCU).o main.$(MCU).o notes.$(MCU).o songs.o
-	$(AVRDIR)\bin\avr-ld -o $@ $(MCU).o main.$(MCU).o notes.$(MCU).o songs.o
+	$(AVRBIN)/avr-ld -o $@ $(MCU).o main.$(MCU).o notes.$(MCU).o songs.o
 
 %.hex:	%.elf
-	$(AVRDIR)\bin\avr-objcopy -O ihex -R .eeporm $< $@
+	$(AVRBIN)/avr-objcopy -O ihex -R .eeporm $< $@
 
 Clean:
-	del *.o *.elf *.hex songs.asm notes.*.asm *~
+	$(RM) *.o *.elf *.hex songs.asm notes.*.asm *~
 
 Help:
 	@echo 'make [MCU=atmega328p|attiny45] [Upload] [Clean] [Help]'
